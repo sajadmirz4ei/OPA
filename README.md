@@ -56,6 +56,63 @@ This project is a simple REST API with two endpoints: one for retrieving a list 
 - `k8s/`: Contains Kubernetes deployment and service configuration files.
 - `opa/`: Contains OPA policies and configuration files.
 
+# OpaAuth Docker Image Build Guide
+
+This guide outlines the steps to build a Docker image for the OpaAuth project.
+
+## Prerequisites
+
+Before proceeding, ensure you have the following installed:
+
+- [.NET Core SDK](https://dotnet.microsoft.com/download)
+- [Docker](https://docs.docker.com/get-docker/)
+
+## Build Steps
+
+1. **Clone the Repository**:
+
+   ```bash
+   git clone https://github.com/your-username/OpaAuth.git
+   cd OpaAuth
+   ```
+
+2. **Restore Dependencies**:
+
+   Ensure all dependencies are restored using the following command:
+
+   ```bash
+   dotnet restore
+   ```
+
+3. **Publish the Application**:
+
+   Publish the application for deployment:
+
+   ```bash
+   dotnet publish -c Release -o ./app/publish
+   ```
+
+4. **Build Docker Image**:
+
+   Build the Docker image using the provided Dockerfile:
+
+   ```bash
+   docker build -t sajadmirz4ei/opaauth:v1 .
+   ```
+
+   Replace `sajadmirz4ei` with your Docker Hub username or your desired repository name.
+
+5. **Push Docker Image**:
+
+   Push the built Docker image to Docker Hub or your preferred registry:
+
+   ```bash
+   docker push sajadmirz4ei/opaauth:v1
+   ```
+
+   Replace `sajadmirz4ei` with your Docker Hub username or your desired repository name.
+
+
 ## Deployment
 
 ### Prerequisites
