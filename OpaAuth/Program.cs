@@ -71,11 +71,8 @@ builder.Services.AddProblemDetails();
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+app.UseSwagger();
+app.UseSwaggerUI();
 app.UseMiddleware<CustomLoggingMiddleware>();
 app.UseHttpsRedirection();
 app.UseAuthentication();

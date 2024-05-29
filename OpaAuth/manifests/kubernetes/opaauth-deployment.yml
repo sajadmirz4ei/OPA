@@ -1,0 +1,67 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    k8s-app: opaauth-api-svc
+  name: opaauth-api-svc
+spec:
+  type: NodePort
+  ports:
+  - name: tcp-8080-opaauth-api
+    port: 8080
+    protocol: TCP
+    targetPort: 8080
+    nodePort: 30000
+  selector:
+    k8s-app: opaauth-api
+  sessionAffinity: None
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    keel.sh/pollSchedule: "@every 1m"
+  labels:
+    keel.sh/policy: force
+    keel.sh/trigger: poll
+    k8s-app: opaauth-api
+  name: opaauth-api
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      k8s-app: opaauth-api
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        k8s-app: opaauth-api
+      name: opaauth-api
+    spec:
+      containers:
+      - name: opaauth-api
+        image: sajadmirz4ei/opaauth:v3
+        ports:
+        - containerPort: 8080
+          name: api-http
+          protocol: TCP
+        resources:
+          limits:
+            memory: 512Mi
+            cpu: 500m
+          requests:
+            cpu: 250m
+            memory: 50Mi
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      imagePullSecrets:
+      - name: docker-pull-secret
+      restartPolicy: Always

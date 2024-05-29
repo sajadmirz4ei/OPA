@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: opa
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: opa
+  template:
+    metadata:
+      labels:
+        app: opa
+    spec:
+      containers:
+      - name: opa
+        image: openpolicyagent/opa:edge
+        args:
+        - "run"
+        - "--server"
+        - "--log-level=debug"
+        - "/policies"
+        ports:
+        - containerPort: 8181
+        volumeMounts:
+        - name: opa-policy
+          mountPath: /policies
+      volumes:
+      - name: opa-policy
+        configMap:
+          name: opa-policy-configmap
+          items:
+          - key: policy.rego
+            path: policy.rego
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: opa-policy-configmap
+data:
+  policy.rego: |
+    package example
+    
+    allow {
+        input.method == "GET"
+        input.path == "/api/users"
+        input.user != ""
+    }
+    
+    allow {
+        input.method == "POST"
+        input.path == "/api/users"
+        input.role == "admin"
+    }
+    
+    allow {
+        input.method == "POST"
+        input.path == "/api/token"
+    }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: opa-svc
+spec:
+  selector:
+    app: opa
+  ports:
+    - protocol: TCP
+      port: 8181
+      targetPort: 8181
+  type: ClusterIP
+
