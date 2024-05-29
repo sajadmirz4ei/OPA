@@ -7,8 +7,8 @@ This project is a simple REST API with two endpoints: one for retrieving a list 
 ### 1. GET `/api/users`
 
 - **Description**: Retrieves a list of users.
-- **Authorization**: Accessible by any authenticated user.
-- **Response**: A JSON array containing user objects with `name`, `email` and `role`  attributes.
+- **Authorization**: Accessible by any authenticated user with a valid JWT.
+- **Response**: A JSON array containing user objects with `name`, `email` and `role` attributes.
   ```json
   [
     {
@@ -26,7 +26,7 @@ This project is a simple REST API with two endpoints: one for retrieving a list 
 ### 2. POST `/api/users`
 
 - **Description**: Creates a new user.
-- **Authorization**: Restricted to users with the "admin" role.
+- **Authorization**: Restricted to users with the "admin" role, validated by a JWT.
 - **Request Body**: A JSON object with `name`, `email` and `role` attributes.
   ```json
   [
@@ -44,15 +44,11 @@ This project is a simple REST API with two endpoints: one for retrieving a list 
 
 ## Authorization and Security
 
-- **Authorization Service**: All authorization decisions are handled by the Open Policy Agent (OPA) service.
-- **Roles**:
-  - **Admin**: Can create new users.
-  - **Authenticated User**: Can read the list of users.
-  - **Unauthorized Users**: No access.
-
-## Deployment
-
-The API service and OPA run within a Kubernetes cluster (e.g., Minikube). Each request's authorization is validated and logged for security and auditing purposes.
+- **JWT**: Used for authorizing users.
+- **OPA**: Enforces policies to ensure:
+  - Only users with the "admin" role can create new users.
+  - Only authenticated users can read the list of users.
+  - Unauthorized users have no access.
 
 ## Project Structure
 
@@ -60,37 +56,41 @@ The API service and OPA run within a Kubernetes cluster (e.g., Minikube). Each r
 - `k8s/`: Contains Kubernetes deployment and service configuration files.
 - `opa/`: Contains OPA policies and configuration files.
 
-## Directory Structure
+## Deployment
 
-OPA/
-├── OpaAuth/
-│ ├── Contracts/
-│ │ ├── IUserRepository.cs
-│ ├── Controllers/
-│ │ ├── TokenController.cs
-│ │ ├── UsersController.cs
-│ ├── DataAccess/
-│ | ├── Repositories/
-│ │ | ├── UsersRepository.cs
-│ ├── MiddleWares/
-│ │ ├── CustomLoggingMiddleware.cs
-│ │ ├── GlobalExceptionHandler.cs
-│ │ ├── OpaAuthorizationMiddleware.cs
-│ ├── Models/
-│ │ ├── OpaResponse.cs
-│ │ ├── User.cs
-│ ├── OpaAuth.csproj
-│ ├── Program.cs
-│ ├── Startup.cs
-│ ├── appsettings.json
-│ ├── appsettings.Development.json
-│ └── Dockerfile
-├── k8s/
-│ ├── opa-deployment.yml
-│ └── opaauth-deployment.yml
-├── opa/
-│ ├── policies/
-│ │ ├── Policy.rego
-├── .gitignore
-├── OpaAuth.sln
-└── README.md
+### Prerequisites
+
+- [Docker](https://www.docker.com/)
+- [Kubernetes](https://kubernetes.io/)
+- [Kubectl](https://kubernetes.io/docs/tasks/tools/)
+- [Minikube](https://minikube.sigs.k8s.io/docs/)
+
+### Setup Instructions
+
+1. **Clone the repository**:
+    ```sh
+    git clone https://github.com/sajadmirz4ei/OPA.git
+    cd OPA
+    ```
+
+2. **Start Minikube**:
+    ```sh
+    minikube start
+    ```
+
+3. **Deploy OPA**:
+    ```sh
+    kubectl apply -f deployment/kubernetes/opa-deployment.yml
+    ```
+
+4. **Deploy the API service**:
+    ```sh
+    kubectl apply -f deployment/kubernetes/opaauth-deployment.yml
+    ```
+
+5. **Access the API and Swagger UI**:
+    ```sh
+    minikube service opaauth-api-svc
+    ```
+
+This command will open the Swagger UI in your default web browser. Use the returned URL to interact with and test the API endpoints.
