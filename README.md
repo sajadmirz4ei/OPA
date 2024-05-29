@@ -150,4 +150,4 @@ Before proceeding, ensure you have the following installed:
     minikube service opaauth-api-svc
     ```
 
-This command will open the Swagger UI in your default web browser. Use the returned URL to interact with and test the API endpoints.
+This command will open the Swagger UI in your default web browser (For example: 127.0.0.1:45321/swagger/index.html). Use the returned URL to interact with and test the API endpoints.
