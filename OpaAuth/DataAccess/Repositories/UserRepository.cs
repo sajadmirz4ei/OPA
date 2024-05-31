@@ -1,7 +1,5 @@
-﻿using Dapper;
-using OpaAuth.Contracts;
+﻿using OpaAuth.Contracts;
 using OpaAuth.Models;
-using System.Data;
 using System.Runtime.Caching;
 
 namespace OpaAuth.DataAccess.Repositories

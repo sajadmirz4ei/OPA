@@ -3,7 +3,6 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.Net.Http.Headers;
 using Microsoft.OpenApi.Models;
 using OpaAuth.Contracts;
-using OpaAuth.DataAccess;
 using OpaAuth.DataAccess.Repositories;
 using OpaAuth.Middlewares;
 using System.Text;
