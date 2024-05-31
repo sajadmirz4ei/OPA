@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authentication.BearerToken;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using OpaAuth.Constants;
 using OpaAuth.Models;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -21,7 +23,7 @@ namespace OpaAuth.Controllers
         }
 
         [HttpPost()]
-        public string GenerateJSONWebToken(User userInfo)
+        public IActionResult GenerateJSONWebToken(User userInfo)
         {
             var secretKey = _configuration["Jwt:Key"];
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
@@ -42,7 +44,13 @@ namespace OpaAuth.Controllers
                 signingCredentials: credentials
             );
 
-            return new JwtSecurityTokenHandler().WriteToken(token);
+            var tokrn = new JwtSecurityTokenHandler().WriteToken(token);
+            return Ok(new
+            {
+                IsSuccess = true,
+                Message = ApiMessages.TokenGenerated,
+                AccessTokenResponse = tokrn
+            });
 
         }
     }

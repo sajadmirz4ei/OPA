@@ -28,7 +28,12 @@ namespace OpaAuth.Controllers
         {
             var users = _userRepository.GetAll();
             _logger.LogInformation(LogMessages.GetAllUsersRequestSuccessful);
-            return Ok(users);
+            return Ok(new
+            {
+                IsSuccess = true,
+                Message = ApiMessages.UsersRetrieved,
+                Data = users
+            });
         }
 
         [HttpPost]
@@ -36,7 +41,11 @@ namespace OpaAuth.Controllers
         {
             _userRepository.Add(user);
             _logger.LogInformation(LogMessages.UserCreationSuccessful, user.Name);
-            return Ok("Succesfully");
+            return Ok(new
+            {
+                IsSuccess = true,
+                Message = ApiMessages.UserCreated,
+            });
         }
     }
 }
