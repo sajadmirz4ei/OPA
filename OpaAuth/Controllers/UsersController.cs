@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using OpaAuth.Constants;
 using OpaAuth.Contracts;
 using OpaAuth.Models;
 using System.IdentityModel.Tokens.Jwt;
@@ -25,8 +26,8 @@ namespace OpaAuth.Controllers
         [HttpGet]
         public ActionResult Get()
         {
-            _logger.LogInformation("Get All Users");
             var users = _userRepository.GetAll();
+            _logger.LogInformation(LogMessages.GetAllUsersRequestSuccessful);
             return Ok(users);
         }
 
@@ -34,7 +35,7 @@ namespace OpaAuth.Controllers
         public IActionResult Create(User user)
         {
             _userRepository.Add(user);
-            _logger.LogInformation($"Create New User : {user.Name}");
+            _logger.LogInformation(LogMessages.UserCreationSuccessful, user.Name);
             return Ok("Succesfully");
         }
     }
