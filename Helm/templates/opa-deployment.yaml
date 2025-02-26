@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-opa
+  labels:
+    {{- include "opa.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.opa.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-opa
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}-opa
+    spec:
+      containers:
+      - name: opa
+        image: "{{ .Values.opa.image.repository }}:{{ .Values.opa.image.tag }}"
+        imagePullPolicy: {{ .Values.opa.image.pullPolicy }}
+        args:
+        - "run"
+        - "--server"
+        - "--log-level={{ .Values.opa.logLevel }}"
+        - "/policies"
+        ports:
+        - containerPort: {{ .Values.opa.service.port }}
+        volumeMounts:
+        - name: {{ .Release.Name }}-opa-policy
+          mountPath: /policies
+        resources:
+          {{- toYaml .Values.opa.resources | nindent 12 }}
+      volumes:
+      - name: {{ .Release.Name }}-opa-policy
+        configMap:
+          name: {{ .Release.Name }}-opa-policy-configmap
+          items:
+          - key: policy.rego
+            path: policy.rego

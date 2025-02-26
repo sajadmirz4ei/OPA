@@ -1,0 +1,73 @@
+# OPAAuth values
+opaauth:
+  replicaCount: 1
+  
+  image:
+    repository: sajadmirz4ei/opaauth
+    tag: v3
+    pullPolicy: IfNotPresent
+  
+  imagePullSecrets:
+    - name: docker-pull-secret
+  
+  service:
+    type: NodePort
+    port: 8080
+    nodePort: 30000
+  
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 250m
+      memory: 50Mi
+  
+  keel:
+    policy: force
+    trigger: poll
+    pollSchedule: "@every 1m"
+
+# OPA values
+opa:
+  replicaCount: 1
+  
+  image:
+    repository: openpolicyagent/opa
+    tag: edge
+    pullPolicy: IfNotPresent
+  
+  service:
+    type: ClusterIP
+    port: 8181
+  
+  logLevel: debug
+  
+  policies:
+    default: |
+      package example
+      
+      allow {
+          input.method == "GET"
+          input.path == "/api/users"
+          input.user != ""
+      }
+      
+      allow {
+          input.method == "POST"
+          input.path == "/api/users"
+          input.role == "admin"
+      }
+      
+      allow {
+          input.method == "POST"
+          input.path == "/api/token"
+      }
+  
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 250m
+      memory: 256Mi

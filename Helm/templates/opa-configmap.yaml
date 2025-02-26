@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-opa-policy-configmap
+  labels:
+    {{- include "opa.labels" . | nindent 4 }}
+data:
+  policy.rego: {{ .Values.opa.policies.default | quote }}

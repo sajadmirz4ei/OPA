@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-auth
+  annotations:
+    keel.sh/pollSchedule: {{ .Values.opaauth.keel.pollSchedule | quote }}
+  labels:
+    k8s-app: {{ .Release.Name }}-auth
+    keel.sh/policy: {{ .Values.opaauth.keel.policy }}
+    keel.sh/trigger: {{ .Values.opaauth.keel.trigger }}
+    {{- include "opaauth.labels" . | nindent 4 }}
+spec:
+  progressDeadlineSeconds: 600
+  replicas: {{ .Values.opaauth.replicaCount }}
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      k8s-app: {{ .Release.Name }}-auth
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        k8s-app: {{ .Release.Name }}-auth
+      name: {{ .Release.Name }}-auth
+    spec:
+      containers:
+        - name: {{ .Release.Name }}-auth
+          image: "{{ .Values.opaauth.image.repository }}:{{ .Values.opaauth.image.tag }}"
+          imagePullPolicy: {{ .Values.opaauth.image.pullPolicy }}
+          ports:
+            - name: api-http
+              containerPort: {{ .Values.opaauth.service.port }}
+              protocol: TCP
+          resources:
+            {{- toYaml .Values.opaauth.resources | nindent 12 }}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      imagePullSecrets:
+        {{- toYaml .Values.opaauth.imagePullSecrets | nindent 8 }}
+      restartPolicy: Always
