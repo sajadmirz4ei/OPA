@@ -1,3 +1,6 @@
+# Global values
+namespace: sandbox-test
+
 # OPAAuth values
 opaauth:
   replicaCount: 1
@@ -11,9 +14,25 @@ opaauth:
     - name: docker-pull-secret
   
   service:
-    type: NodePort
+    type: ClusterIP
     port: 8080
-    nodePort: 30000
+
+  ingress:
+    enabled: true
+    className: "nginx"
+    annotations:
+      nginx.ingress.kubernetes.io/ssl-redirect: "true"
+      nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
+      nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    hosts:
+      - host: sandbox-test.bettech.cloud
+        paths:
+          - path: /
+            pathType: Prefix
+    tls:
+      - secretName: ssl-cert
+        hosts:
+          - sandbox-test.bettech.cloud
   
   resources:
     limits:
@@ -47,19 +66,19 @@ opa:
     default: |
       package example
       
-      allow {
+      allow if {
           input.method == "GET"
           input.path == "/api/users"
           input.user != ""
       }
       
-      allow {
+      allow if {
           input.method == "POST"
           input.path == "/api/users"
           input.role == "admin"
       }
       
-      allow {
+      allow if {
           input.method == "POST"
           input.path == "/api/token"
       }
