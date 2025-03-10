@@ -64,23 +64,45 @@ opa:
   
   policies:
     default: |
-      package example
-      
-      allow if {
+      package system.authz
+
+      # Helper rules to check conditions
+      is_get_users_allowed {
           input.method == "GET"
           input.path == "/api/users"
           input.user != ""
       }
-      
-      allow if {
+
+      is_post_users_allowed {
           input.method == "POST"
           input.path == "/api/users"
           input.role == "admin"
       }
-      
-      allow if {
+
+      is_post_token_allowed {
           input.method == "POST"
           input.path == "/api/token"
+      }
+
+      # Single allow rule that uses the helper rules
+      allow = response {
+          response := calc_response
+      }
+
+      # Calculate the response
+      calc_response = true {
+          is_get_users_allowed
+      }
+      calc_response = true {
+          is_post_users_allowed
+      }
+      calc_response = true {
+          is_post_token_allowed
+      }
+      calc_response = false {
+          not is_get_users_allowed
+          not is_post_users_allowed
+          not is_post_token_allowed
       }
   
   resources:
