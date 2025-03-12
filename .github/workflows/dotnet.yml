@@ -42,5 +42,5 @@ jobs:
         context: .
         push: true
         tags: |
-          ${{ secrets.DOCKERHUB_USERNAME }}/sajadmirz4ei/opaauth:latest
-          ${{ secrets.DOCKERHUB_USERNAME }}/sajadmirz4ei/opaauth:${{ github.sha }}
+          sajadmirz4ei/opaauth:latest
+          sajadmirz4ei/opaauth:${{ github.sha }}
