@@ -31,7 +31,7 @@ spec:
             pathType: {{ .pathType }}
             backend:
               service:
-                name: {{ $.Release.Name }}-opaauth
+                name: {{ $.Release.Name }}-auth-svc
                 port:
                   number: {{ $.Values.opaauth.service.port }}
           {{- end }}
